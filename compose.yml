@@ -39,7 +39,7 @@ services:
 #      PHP_XDEBUG_IDEKEY: "my-ide"
 #      PHP_XDEBUG_LOG: /tmp/php-xdebug.log
     volumes:
-    - ./:/var/www/html:cached
+    - ./html/web:/var/www/html:cached
 ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/wordpress/local#docker-for-mac
 #    - wordpress:/var/www/html
 #    # For XHProf and Xdebug profiler traces
@@ -68,8 +68,13 @@ services:
       NGINX_BACKEND_HOST: php
       NGINX_VHOST_PRESET: wordpress
       #NGINX_SERVER_ROOT: /var/www/html/subdir
+  
+    ports:
+     - "80:80"
+     - "443:443"
     volumes:
-    - ./:/var/www/html:cached
+    - ./html/web:/var/www/html:cached
+ 
 ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/wordpress/local#docker-for-mac
 #    - wordpress:/var/www/html
     labels:
@@ -113,9 +118,9 @@ services:
 #    - "traefik.http.services.${PROJECT_NAME}_varnish.loadbalancer.server.port=6081"
 #    - "traefik.http.routers.${PROJECT_NAME}_varnish.rule=Host(`varnish.${PROJECT_BASE_URL}`)"
 
-#  valkey:
-#    container_name: "${PROJECT_NAME}_valkey"
-#    image: wodby/valkey:$VALKEY_TAG
+  valkey:
+    container_name: "${PROJECT_NAME}_valkey"
+    image: wodby/valkey:$VALKEY_TAG
 
 #  adminer:
 #    container_name: "${PROJECT_NAME}_adminer"
@@ -138,17 +143,17 @@ services:
 #    - files:/mnt/files
 #    - ./:/mnt/codebase:cached
 
-#  pma:
-#    image: phpmyadmin/phpmyadmin
-#    container_name: "${PROJECT_NAME}_pma"
-#    environment:
-#      PMA_HOST: $DB_HOST
-#      PMA_USER: $DB_USER
-#      PMA_PASSWORD: $DB_PASSWORD
-#      PHP_UPLOAD_MAX_FILESIZE: 1G
-#      PHP_MAX_INPUT_VARS: 1G
-#    labels:
-#    - "traefik.http.routers.${PROJECT_NAME}_pma.rule=Host(`pma.${PROJECT_BASE_URL}`)"
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: "${PROJECT_NAME}_pma"
+    environment:
+      PMA_HOST: $DB_HOST
+      PMA_USER: $DB_USER
+      PMA_PASSWORD: $DB_PASSWORD
+      PHP_UPLOAD_MAX_FILESIZE: 1G
+      PHP_MAX_INPUT_VARS: 1G
+    labels:
+    - "traefik.http.routers.${PROJECT_NAME}_pma.rule=Host(`pma.${PROJECT_BASE_URL}`)"
 
 #  gotenberg:
 #    image: gotenberg/gotenberg
@@ -163,22 +168,22 @@ services:
 #    - "traefik.http.services.${PROJECT_NAME}_solr.loadbalancer.server.port=8983"
 #    - "traefik.http.routers.${PROJECT_NAME}_solr.rule=Host(`solr.${PROJECT_BASE_URL}`)"
 
-#  elasticsearch:
-#    image: wodby/elasticsearch:$ELASTICSEARCH_TAG
-#    environment:
-#      ES_JAVA_OPTS: "-Xms500m -Xmx500m"
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
+  elasticsearch:
+    image: wodby/elasticsearch:$ELASTICSEARCH_TAG
+    environment:
+      ES_JAVA_OPTS: "-Xms500m -Xmx500m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
 
-#  kibana:
-#    image: wodby/kibana:$KIBANA_TAG
-#    depends_on:
-#    - elasticsearch
-#    labels:
-#    - "traefik.http.services.${PROJECT_NAME}_kibana.loadbalancer.server.port=5601"
-#    - "traefik.http.routers.${PROJECT_NAME}_kibana.rule=Host(`kibana.${PROJECT_BASE_URL}`)"
+  kibana:
+    image: wodby/kibana:$KIBANA_TAG
+    depends_on:
+    - elasticsearch
+    labels:
+    - "traefik.http.services.${PROJECT_NAME}_kibana.loadbalancer.server.port=5601"
+    - "traefik.http.routers.${PROJECT_NAME}_kibana.rule=Host(`kibana.${PROJECT_BASE_URL}`)"
 
 #  node:
 #    image: wodby/node:$NODE_TAG
@@ -197,9 +202,9 @@ services:
 #    container_name: "${PROJECT_NAME}_memcached"
 #    image: wodby/memcached:$MEMCACHED_TAG
 
-#  opensmtpd:
-#    container_name: "${PROJECT_NAME}_opensmtpd"
-#    image: wodby/opensmtpd:$OPENSMTPD_TAG
+  opensmtpd:
+    container_name: "${PROJECT_NAME}_opensmtpd"
+    image: wodby/opensmtpd:$OPENSMTPD_TAG
 
 #  rsyslog:
 #    container_name: "${PROJECT_NAME}_rsyslog"
@@ -219,7 +224,7 @@ services:
     command: --api.insecure=true --providers.docker
     ports:
     - '8000:80'
-#    - '8080:8080' # Dashboard
+    - '8080:8080' # Dashboard
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
 
